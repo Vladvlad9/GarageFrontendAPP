@@ -59,9 +59,13 @@ export const useAuthStore = defineStore("authStore", {
             try {
                 await signUp(payload)
                 this.status = "idle";
+                return true
             } catch (error) {
                 this.status = "error";
                 this.error = error instanceof Error ? error.message : "Unknown error";
+                return false
+            } finally {
+                this.status = 'idle'
             }
         },
         signOut() {
