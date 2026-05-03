@@ -21,6 +21,7 @@ const showPassword = ref(false)
 const focusedField = ref(null)
 const errors = ref({})
 
+
 function fieldError(field) {
   return errors.value[field] || null
 }
