@@ -48,7 +48,7 @@ export const useAuthStore = defineStore("authStore", {
                 this.status = "error";
                 this.error = error instanceof Error ? error.message : "Unknown error";
                 return false
-            }finally {
+            } finally {
                 this.status = 'idle'
             }
         },
@@ -78,7 +78,7 @@ export const useAuthStore = defineStore("authStore", {
             localStorage.removeItem(ACCESS_TOKEN_KEY);
             localStorage.removeItem(REFRESH_TOKEN_KEY);
         },
-        clearError(){
+        clearError() {
             this.error = null
         },
 
