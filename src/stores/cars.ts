@@ -4,6 +4,13 @@ import {getCar, getCars} from "../api/cars.ts";
 
 type LoadStatus = "idle" | "loading" | "saving" | "error";
 
+interface SettingsState {
+    notifyKm: boolean,
+    notifyDays: boolean,
+    warnKmBefore: number,
+    warnDaysBefore: number,
+}
+
 interface CarsState {
     status: LoadStatus;
     error: string | null;
@@ -14,6 +21,7 @@ interface CarsState {
     page: number;
     pageSize: number;
     pageCount: number;
+    settings: SettingsState
 }
 
 export const useCarsStorage = defineStore('carsStorage', {
@@ -27,6 +35,13 @@ export const useCarsStorage = defineStore('carsStorage', {
         page: 1,
         pageSize: 10,
         pageCount: 1,
+
+        settings: {
+            notifyKm: true,
+            notifyDays: true,
+            warnKmBefore: 1000,
+            warnDaysBefore: 30,
+        },
     }),
     getters: {
         hasCars: (state) => state.items.length > 0,
@@ -81,7 +96,7 @@ export const useCarsStorage = defineStore('carsStorage', {
         },
         async updateCar() {
         },
-        async deleteCar() {
+        async _deleteCar(id: string) {
         },
 
         async selectCar(id: string) {
@@ -100,6 +115,10 @@ export const useCarsStorage = defineStore('carsStorage', {
             const last = new Date(item.last_date)
             const days = Math.round((NOW.getTime() - last.getTime()) / 86400000)
             return Math.min(days / item.interval_days, 1)
+        },
+
+        toggleSetting(key: 'notifyKm' | 'notifyDays') {
+            this.settings[key] = !this.settings[key];
         }
     }
 })
