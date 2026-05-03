@@ -4,7 +4,6 @@ import {getCar, getCars} from "../api/cars.ts";
 
 type LoadStatus = "idle" | "loading" | "saving" | "error";
 
-
 interface CarsState {
     status: LoadStatus;
     error: string | null;
@@ -41,13 +40,17 @@ export const useCarsStorage = defineStore('carsStorage', {
                 const cars = await getCars()
                 this.items = cars.results
 
-                const selectedFromList =
-                    (this.selectedId ? this.items.find((car) => car.id === this.selectedId) : null) ??
-                    this.items[0] ??
-                    null;
+                let selectedFromList = null
+
+                if (this.selectedId) {
+                    selectedFromList = this.items.find(car => car.id === this.selectedId) || null
+                }
+
+                if (!selectedFromList && this.items.length > 0) selectedFromList = this.items[0]
 
                 this.selectedId = selectedFromList?.id ?? null;
                 this.selectedCar = selectedFromList;
+                this.serviceItems = selectedFromList?.serviceItems ?? null
 
                 this.status = "idle";
             } catch (error) {
@@ -66,35 +69,37 @@ export const useCarsStorage = defineStore('carsStorage', {
                 const car: Car = await getCar(id)
                 this.selectedCar = car
                 this.selectedId = car.id
-
                 return car
             } catch (error) {
-                this.status = "error";
-                this.error = error instanceof Error ? error.message : "Unknown error";
-            } finally {
-                this.status = 'idle'
+                this.status = "error"
+                this.error = error instanceof Error ? error.message : "Unknown error"
+                return null
             }
         },
+
         async createCar() {
         },
         async updateCar() {
         },
         async deleteCar() {
         },
+
         async selectCar(id: string) {
-            const selected_car: Car = await this._getCar(id)
-            this.selectedCar = selected_car
-            this.selectedId = selected_car.id
+            const selected_car = await this._getCar(id)
+
+            if (!selected_car) return
+
             this.serviceItems = selected_car.serviceItems
         },
-        getProgress(item, car: Car) {
+
+        getProgress(item: ServiceItem, car: Car) {
             const NOW = new Date()
-            if (item.intervalKm > 0) {
-                return Math.min((car.mileage - item.lastKm) / item.intervalKm, 1)
+            if (item.interval_km > 0) {
+                return Math.min((car.mileage - item.last_km) / item.interval_km, 1)
             }
-            const last = new Date(item.lastDate)
+            const last = new Date(item.last_date)
             const days = Math.round((NOW.getTime() - last.getTime()) / 86400000)
-            return Math.min(days / item.intervalDays, 1)
+            return Math.min(days / item.interval_days, 1)
         }
     }
 })

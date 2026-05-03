@@ -6,6 +6,7 @@ import LoginView from "./views/LoginView.vue";
 import './assets/global.css'
 import RegisterView from "./views/RegisterView.vue";
 import OverviewView from "./views/OverviewView.vue";
+import HistoryView from "./views/HistoryView.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -14,6 +15,7 @@ const router = createRouter({
         {path: '/login', component: LoginView, meta: {guest: true}},
         {path: '/register', component: RegisterView, meta: {guest: true}},
         {path: '/overview', component: OverviewView, meta: {requiresAuth: true}},
+        {path: '/history', component: HistoryView, meta: {requiresAuth: true}},
     ]
 })
 

@@ -37,10 +37,10 @@ export interface Car {
     fuel_type: FuelType | null;
     transmission: TransmissionType | null;
     notes: string | null;
+    serviceItems: ServiceItem[];
     is_archived: boolean;
     created_at: string;
     updated_at: string | null;
-    serviceItems: ServiceItem[];
     initials?: string | null;
 }
 
