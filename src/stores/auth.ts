@@ -52,6 +52,7 @@ export const useAuthStore = defineStore("authStore", {
                 this.status = 'idle'
             }
         },
+
         async signUp(payload: SignUpRequest) {
             this.status = 'loading'
             this.error = null
@@ -68,6 +69,7 @@ export const useAuthStore = defineStore("authStore", {
                 this.status = 'idle'
             }
         },
+
         signOut() {
             this.status = "idle";
             this.error = null;

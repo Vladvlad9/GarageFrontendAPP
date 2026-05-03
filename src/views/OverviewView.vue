@@ -1,7 +1,26 @@
 <script setup lang="ts">
 import {useCarsStorage} from "../stores/cars.ts";
+import {useModalStorage} from "../stores/modal.ts";
+import ServiceCard from "../components/ServiceCard.vue";
+import {computed} from "vue";
 
 const car = useCarsStorage()
+const modal = useModalStorage()
+
+const urgentServices = computed(() =>
+    []
+)
+
+const warnServices = computed(() =>
+    []
+)
+
+const okServices = computed(() =>
+    []
+)
+const sortedServices = computed(() =>
+    []
+)
 </script>
 
 <template>
@@ -34,21 +53,22 @@ const car = useCarsStorage()
         <path d="M10 9v4"/>
         <circle cx="10" cy="15" r="0.5" fill="currentColor"/>
       </svg>
-      Возраст авто — {{ car.selectedCar.year }} лет. Рекомендуем сократить интервалы ТО и чаще проверять патрубки и уплотнители.
+      Возраст авто — {{ car.selectedCar.year }} лет. Рекомендуем сократить интервалы ТО и чаще проверять патрубки и
+      уплотнители.
     </div>
 
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Требует замены</div>
         <div class="metric-value" :class="urgentServices.length > 0 ? 'red' : 'green'">
-          {{ urgentServices.length }}
+          {{ 30 }}
         </div>
         <div class="metric-sub">срочно</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Скоро заменить</div>
         <div class="metric-value" :class="warnServices.length > 0 ? 'amber' : 'green'">
-          {{ warnServices.length }}
+          {{ 30 }}
         </div>
         <div class="metric-sub">в ближайшее время</div>
       </div>
@@ -62,7 +82,7 @@ const car = useCarsStorage()
     <div class="section-title">Регламенты ТО</div>
     <div class="service-grid">
       <ServiceCard
-          v-for="service in sortedServices"
+          v-for="service in car.selectedCar.serviceItems"
           :key="service.id"
           :service="service"
           :car="car.selectedCar"
@@ -74,14 +94,14 @@ const car = useCarsStorage()
     <div class="history-card">
       <div v-if="car.selectedCar.serviceItems.length === 0" class="empty">Нет записей</div>
       <div
-          v-for="(h, i) in store.activeHistory.slice(0, 5)"
+          v-for="(h, i) in car.selectedCar.serviceItems.slice(0, 5)"
           :key="i"
           class="history-row"
       >
         <div class="hist-dot" style="background: #4ade80"/>
         <span class="hist-name">{{ h.name }}</span>
-        <span class="hist-km">{{ h.km.toLocaleString('ru') }} км</span>
-        <span class="hist-date">{{ formatDate(h.date) }}</span>
+        <span class="hist-km">{{ 99 }} км</span>
+        <span class="hist-date">{{ 9999 }}</span>
       </div>
     </div>
   </div>

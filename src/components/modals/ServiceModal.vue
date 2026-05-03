@@ -31,7 +31,7 @@ function confirm() {
         <div class="modal-title">Отметить ТО — {{ car.selectedCar?.name }}</div>
         <div class="field">
           <label>Пункт ТО</label>
-          <select v-model="car.selectedCar?.id">
+          <select>
             <option v-for="s in car.selectedCar?.serviceItems" :key="s.id" :value="s.id">{{ s.name }}</option>
           </select>
         </div>

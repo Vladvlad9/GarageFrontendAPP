@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
-import type {Car} from "../types/cars.ts";
-import {getCars} from "../api/cars.ts";
+import type {Car, ServiceItem} from "../types/cars.ts";
+import {getCar, getCars} from "../api/cars.ts";
 
 type LoadStatus = "idle" | "loading" | "saving" | "error";
 
@@ -11,6 +11,7 @@ interface CarsState {
     items: Car[];
     selectedId: string | null;
     selectedCar: Car | null;
+    serviceItems: ServiceItem[] | null,
     page: number;
     pageSize: number;
     pageCount: number;
@@ -23,6 +24,7 @@ export const useCarsStorage = defineStore('carsStorage', {
         items: [],
         selectedId: null,
         selectedCar: null,
+        serviceItems: null,
         page: 1,
         pageSize: 10,
         pageCount: 1,
@@ -56,7 +58,22 @@ export const useCarsStorage = defineStore('carsStorage', {
             }
         },
 
-        async getCar() {
+        async _getCar(id: string) {
+            this.status = 'loading'
+            this.error = null
+
+            try {
+                const car: Car = await getCar(id)
+                this.selectedCar = car
+                this.selectedId = car.id
+
+                return car
+            } catch (error) {
+                this.status = "error";
+                this.error = error instanceof Error ? error.message : "Unknown error";
+            } finally {
+                this.status = 'idle'
+            }
         },
         async createCar() {
         },
@@ -64,7 +81,12 @@ export const useCarsStorage = defineStore('carsStorage', {
         },
         async deleteCar() {
         },
-
+        async selectCar(id: string) {
+            const selected_car: Car = await this._getCar(id)
+            this.selectedCar = selected_car
+            this.selectedId = selected_car.id
+            this.serviceItems = selected_car.serviceItems
+        },
         getProgress(item, car: Car) {
             const NOW = new Date()
             if (item.intervalKm > 0) {

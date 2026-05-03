@@ -22,27 +22,30 @@ const iconMap = {
   fuel: IconFuel
 }
 
-const props = defineProps({service: Object, car: Object})
+const props = defineProps({ service: Object, car: Object })
 const emit = defineEmits(['click'])
+const store = useCarsStorage()
 
 const iconColor = computed(() => ICON_COLORS[props.service.icon] || '#888')
 const iconComponent = computed(() => iconMap[props.service.icon] || IconOil)
 
-const progress = computed(() => car.getProgress(props.service, props.car))
+const progress = computed(() => store.getProgress(props.service, props.car))
 const pct = computed(() => Math.min(Math.round(progress.value * 100), 100))
 const isUrgent = computed(() => progress.value >= 1)
 const badge = computed(() => getBadge(progress.value, props.service))
 const barColor = computed(() => getBarColor(progress.value, props.service))
 
-const car = useCarsStorage()
+
 
 const meta = computed(() => {
-  const kmLeft = store.getKmLeft(props.service, props.car)
+  const kmLeft = 0
+
   if (kmLeft !== null) {
     if (kmLeft === 0) return 'Пробег исчерпан'
     return 'Осталось ' + kmLeft.toLocaleString('ru') + ' км'
   }
   const d = store.getDaysLeft(props.service)
+
   if (d !== null) {
     if (d < 0) return 'Просрочено на ' + Math.abs(d) + ' дн.'
     return 'Осталось ' + d + ' дн.'
@@ -67,9 +70,8 @@ const rangeText = computed(() => {
         <component :is="iconComponent"/>
       </div>
       <div>
-        <div class="sc-name">{{ car.selectedCar?.serviceItems.name }}</div>
-<!--        <div class="sc-meta">{{ meta }}</div>-->
-        <div class="sc-meta">{{ 0 }}</div>
+        <div class="sc-name">{{ service.name }}</div>
+        <div class="sc-meta">{{ meta }}</div>
       </div>
     </div>
     <div class="progress">

@@ -5,13 +5,15 @@ import {createPinia} from "pinia";
 import LoginView from "./views/LoginView.vue";
 import './assets/global.css'
 import RegisterView from "./views/RegisterView.vue";
+import OverviewView from "./views/OverviewView.vue";
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {path: '/', redirect: '/overview'},
         {path: '/login', component: LoginView, meta: {guest: true}},
-        {path: '/register', component: RegisterView, meta: {guest: true}}
+        {path: '/register', component: RegisterView, meta: {guest: true}},
+        {path: '/overview', component: OverviewView, meta: {requiresAuth: true}},
     ]
 })
 
