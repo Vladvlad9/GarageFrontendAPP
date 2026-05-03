@@ -1,4 +1,24 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
+import {createRouter, createWebHistory} from "vue-router";
+import {createPinia} from "pinia";
 
-createApp(App).mount('#app')
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {path: '/', redirect: '/overview'},
+        {path: '/login', component: LoginView, meta: {guest: true}}
+    ]
+})
+
+router.beforeEach((to) => {
+    const token = localStorage.getItem('accessToken')
+    if (to.meta.requiresAuth && !token) return '/login'
+    if (to.meta.guest && token) return '/overview'
+})
+
+const pinia = createPinia()
+const app = createApp(App)
+app.use(pinia)
+app.use(router)
+app.mount('#app')
