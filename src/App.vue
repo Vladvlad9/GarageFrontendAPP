@@ -7,6 +7,7 @@ import AddCarModal from "./components/modals/AddCarModal.vue";
 import MileageModal from "./components/modals/MileageModal.vue";
 import ServiceModal from "./components/modals/ServiceModal.vue";
 import TheSidebar from "./components/TheSidebar.vue";
+import TheTopbar from "./components/TheTopbar.vue";
 
 const route = useRoute()
 const auth = useAuthStore()
