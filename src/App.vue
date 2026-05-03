@@ -9,6 +9,7 @@ import ServiceModal from "./components/modals/ServiceModal.vue";
 import TheSidebar from "./components/TheSidebar.vue";
 import TheTopbar from "./components/TheTopbar.vue";
 import TheTabs from "./components/TheTabs.vue";
+import AppSkeleton from "./components/AppSkeleton.vue";
 
 const route = useRoute()
 const auth = useAuthStore()
@@ -33,7 +34,7 @@ onMounted(() => {
     <div id="layout">
       <TheSidebar/>
       <div class="main">
-        <template v-if="auth.status === 'idle'">
+        <template v-if="auth.status === 'loading'">
           <AppSkeleton/>
         </template>
         <template v-else>
