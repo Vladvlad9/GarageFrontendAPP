@@ -3,6 +3,7 @@ import {useRoute} from "vue-router";
 import {computed, onMounted} from "vue";
 import {useAuthStore} from "./stores/auth.ts";
 import {useCarsStorage} from "./stores/cars.ts";
+import AddCarModal from "./components/modals/AddCarModal.vue";
 
 const route = useRoute()
 const auth = useAuthStore()
