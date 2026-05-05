@@ -2,25 +2,10 @@
 import {useCarsStorage} from "../stores/cars.ts";
 import {useModalStorage} from "../stores/modal.ts";
 import ServiceCard from "../components/ServiceCard.vue";
-import {computed} from "vue";
 
 const car = useCarsStorage()
 const modal = useModalStorage()
 
-const urgentServices = computed(() =>
-    []
-)
-
-const warnServices = computed(() =>
-    []
-)
-
-const okServices = computed(() =>
-    []
-)
-const sortedServices = computed(() =>
-    []
-)
 </script>
 
 <template>
@@ -46,35 +31,35 @@ const sortedServices = computed(() =>
   </div>
 
   <!-- Есть автомобиль -->
-  <div v-else-if="car.selectedCar">
-    <div v-if="car.selectedCar.year >= 20" class="age-warn">
+  <div v-else-if="car.currentCar">
+    <div v-if="car.currentCar.year >= 20" class="age-warn">
       <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M10 2l8 16H2z"/>
         <path d="M10 9v4"/>
         <circle cx="10" cy="15" r="0.5" fill="currentColor"/>
       </svg>
-      Возраст авто — {{ car.selectedCar.year }} лет. Рекомендуем сократить интервалы ТО и чаще проверять патрубки и
+      Возраст авто — {{ car.currentCar.year }} лет. Рекомендуем сократить интервалы ТО и чаще проверять патрубки и
       уплотнители.
     </div>
 
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Требует замены</div>
-        <div class="metric-value" :class="urgentServices.length > 0 ? 'red' : 'green'">
-          {{ 30 }}
+        <div class="metric-value" :class="car.urgentCount > 0 ? 'red' : 'green'">
+          {{ car.urgentCount }}
         </div>
         <div class="metric-sub">срочно</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Скоро заменить</div>
-        <div class="metric-value" :class="warnServices.length > 0 ? 'amber' : 'green'">
-          {{ 30 }}
+        <div class="metric-value" :class="car.warnCount > 0 ? 'amber' : 'green'">
+          {{ car.warnCount }}
         </div>
         <div class="metric-sub">в ближайшее время</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">В норме</div>
-        <div class="metric-value green">{{ okServices.length }}</div>
+        <div class="metric-value green">{{ car.okCount }}</div>
         <div class="metric-sub">регламентов</div>
       </div>
     </div>
@@ -82,26 +67,26 @@ const sortedServices = computed(() =>
     <div class="section-title">Регламенты ТО</div>
     <div class="service-grid">
       <ServiceCard
-          v-for="service in car.selectedCar.serviceItems"
+          v-for="service in car.currentServices"
           :key="service.id"
           :service="service"
-          :car="car.selectedCar"
+          :car="car.currentCar"
           @click="modal.open('service', service.id)"
       />
     </div>
 
     <div class="section-title">Последние записи</div>
     <div class="history-card">
-      <div v-if="car.selectedCar.serviceItems.length === 0" class="empty">Нет записей</div>
+      <div v-if="car.currentServices.length === 0" class="empty">Нет записей</div>
       <div
-          v-for="(h, i) in car.selectedCar.serviceItems.slice(0, 5)"
+          v-for="(h, i) in car.recentServices"
           :key="i"
           class="history-row"
       >
         <div class="hist-dot" style="background: #4ade80"/>
         <span class="hist-name">{{ h.name }}</span>
-        <span class="hist-km">{{ 99 }} км</span>
-        <span class="hist-date">{{ 9999 }}</span>
+        <span class="hist-km">{{ h.lastKm.toLocaleString('ru') }} км</span>
+        <span class="hist-date">{{ h.lastDate ?? '—' }}</span>
       </div>
     </div>
   </div>

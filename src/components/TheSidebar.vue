@@ -46,15 +46,15 @@ function handleLogout() {
         </svg>
         История ТО
       </RouterLink>
-      <RouterLink to="/reminders" class="nav-item" active-class="active">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M10 2a6 6 0 0 1 6 6v3l1.5 3H2.5L4 11V8a6 6 0 0 1 6-6z"/>
-          <path d="M8 17a2 2 0 0 0 4 0"/>
-        </svg>
-        Напоминания
-<!--        <span v-if="100" class="nav-badge">{{ 100 }}</span>-->
-        <span class="nav-badge">{{ 100 }}</span>
-      </RouterLink>
+<!--      <RouterLink to="/reminders" class="nav-item" active-class="active">-->
+<!--        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">-->
+<!--          <path d="M10 2a6 6 0 0 1 6 6v3l1.5 3H2.5L4 11V8a6 6 0 0 1 6-6z"/>-->
+<!--          <path d="M8 17a2 2 0 0 0 4 0"/>-->
+<!--        </svg>-->
+<!--        Напоминания-->
+<!--&lt;!&ndash;        <span v-if="100" class="nav-badge">{{ 100 }}</span>&ndash;&gt;-->
+<!--        <span class="nav-badge">{{ 100 }}</span>-->
+<!--      </RouterLink>-->
       <RouterLink to="/settings" class="nav-item" active-class="active">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="10" cy="10" r="2.5"/>
@@ -76,7 +76,7 @@ function handleLogout() {
         <div class="car-dot" :style="{ background: car.color }"/>
         <span class="car-name">{{ car.name }} '{{ String(car.year).slice(2) }}</span>
         <span  class="car-urgent">
-          {{ 500 }}
+          {{ car.id === carStorage.currentCar?.id ? carStorage.urgentCount : 0 }}
         </span>
       </div>
       <div class="add-car" @click="modal.open('addCar')">

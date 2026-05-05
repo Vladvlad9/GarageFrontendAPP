@@ -9,24 +9,24 @@ const modal = useModalStorage()
 
 <template>
   <div class="topbar">
-    <template v-if="car.selectedCar">
+    <template v-if="car.currentCar">
       <div class="topbar-left">
         <div
             class="car-avatar"
             :style="{
-            background: car.selectedCar.color + '22',
-            color: car.selectedCar.color,
-            border: `1px solid ${car.selectedCar.color}44`
+            background: car.currentCar.color + '22',
+            color: car.currentCar.color,
+            border: `1px solid ${car.currentCar.color}44`
           }"
         >
-          {{ car.selectedCar.initials }}
+          {{ car.currentCar.initials }}
         </div>
         <div>
-          <div class="topbar-title">{{ car.selectedCar.name }} '{{ String(car.selectedCar.year).slice(2) }}</div>
+          <div class="topbar-title">{{ car.currentCar.name }} '{{ String(car.currentCar.year).slice(2) }}</div>
           <div class="topbar-sub">
-            {{ car.selectedCar.mileage.toLocaleString('ru') }} км ·
-            <span :style="{ color: 10 > 0 ? 'var(--red)' : 'var(--muted)' }">{{ 10 }} срочно</span>
-            · {{ 10 }} скоро
+            {{ car.currentCar.mileage.toLocaleString('ru') }} км ·
+            <span :style="{ color: car.urgentCount > 0 ? 'var(--red)' : 'var(--muted)' }">{{ car.urgentCount }} срочно</span>
+            · {{ car.warnCount }} скоро
           </div>
         </div>
       </div>

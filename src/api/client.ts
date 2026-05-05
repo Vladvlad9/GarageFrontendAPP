@@ -1,4 +1,5 @@
 import axios, {AxiosError, type AxiosRequestConfig} from 'axios';
+import {useAuthStore} from "../stores/auth.ts";
 
 // const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
 const baseUrl = "http://0.0.0.0:9881/api/v1"
@@ -67,6 +68,10 @@ export async function requestJson<T>(path: string, config: AxiosRequestConfig = 
 
         return response.data as T;
     } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            const auth = useAuthStore();
+            auth.signOut();
+        }
         if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
             let message = `Request failed with status ${axiosError.response?.status ?? 'unknown'}`;

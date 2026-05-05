@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import {useCarsStorage} from "../stores/cars.ts";
-
-const carStore = useCarsStorage()
-
 </script>
 
 <template>

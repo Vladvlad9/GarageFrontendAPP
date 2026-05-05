@@ -15,7 +15,7 @@ const car = useCarsStorage()
             <div class="settings-name">По пробегу</div>
             <div class="settings-desc">Напоминать когда подходит пробег замены</div>
           </div>
-          <div class="toggle" :class="{ on: car.settings.notifyKm }" @click="car.toggleSetting('notifyKm')">
+          <div class="toggle" @click="car.toggleSetting('notifyKm')">
             <div class="toggle-knob"/>
           </div>
         </div>
@@ -57,15 +57,15 @@ const car = useCarsStorage()
     <div class="settings-section">
       <div class="section-title">Автомобили</div>
       <div class="settings-card">
-        <div v-for="car in car.items" :key="car.id" class="settings-row">
+        <div v-for="carItem in car.items" :key="carItem.id" class="settings-row">
           <div class="settings-label">
             <div class="settings-name" style="display:flex;align-items:center;gap:8px">
-              <div class="car-dot" :style="{ background: car.color }"/>
-              {{ car.name }} '{{ String(car.year).slice(2) }}
+              <div class="car-dot" :style="{ background: carItem.color }"/>
+              {{ carItem.name }} '{{ String(carItem.year).slice(2) }}
             </div>
-            <div class="settings-desc">{{ car.mileage.toLocaleString('ru') }} км</div>
+            <div class="settings-desc">{{ carItem.mileage.toLocaleString('ru') }} км</div>
           </div>
-          <button class="btn-danger" @click="car._deleteCar(car.id)">Удалить</button>
+          <button class="btn-danger" @click="car._deleteCar(carItem.id)">Удалить</button>
         </div>
       </div>
     </div>

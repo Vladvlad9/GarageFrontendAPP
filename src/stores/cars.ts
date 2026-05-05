@@ -24,6 +24,21 @@ interface CarsState {
     settings: SettingsState
 }
 
+function calcProgress(item: ServiceItem, car: Car) {
+    if (item.intervalKm > 0) {
+        return Math.min((car.mileage - item.lastKm) / item.intervalKm, 1)
+    }
+    if (!item.lastDate) {
+        return 0
+    }
+    const last = new Date(item.lastDate)
+    if (Number.isNaN(last.getTime())) {
+        return 0
+    }
+    const days = Math.round((Date.now() - last.getTime()) / 86400000)
+    return Math.min(days / item.intervalDays, 1)
+}
+
 export const useCarsStorage = defineStore('carsStorage', {
     state: (): CarsState => ({
         status: "idle",
@@ -45,8 +60,51 @@ export const useCarsStorage = defineStore('carsStorage', {
     }),
     getters: {
         hasCars: (state) => state.items.length > 0,
+        currentCar: (state): Car | null => state.selectedCar ?? state.items[0] ?? null,
+        currentServices(): ServiceItem[] {
+            return this.currentCar?.serviceItems ?? [];
+        },
+        urgentCount(): number {
+            const car = this.selectedCar ?? this.items[0] ?? null
+            if (!car) return 0
+
+            return car.serviceItems.filter((service) => calcProgress(service, car) >= 1).length
+        },
+        warnCount(): number {
+            const car = this.selectedCar ?? this.items[0] ?? null
+            if (!car) return 0
+
+            return car.serviceItems.filter((service) => {
+                const progress = calcProgress(service, car)
+                return progress >= service.warnAt && progress < 1
+            }).length
+        },
+        okCount(): number {
+            const car = this.selectedCar ?? this.items[0] ?? null
+            if (!car) return 0
+
+            return car.serviceItems.filter((service) => calcProgress(service, car) < service.warnAt).length
+        },
+        recentServices(): ServiceItem[] {
+            return [...(this.currentCar?.serviceItems ?? [])].sort((a, b) => {
+                const aTime = a.lastDate ? new Date(a.lastDate).getTime() : 0
+                const bTime = b.lastDate ? new Date(b.lastDate).getTime() : 0
+                return bTime - aTime
+            }).slice(0, 5)
+        }
     },
     actions: {
+        clearCars() {
+            this.status = "idle";
+            this.error = null;
+            this.items = [];
+            this.selectedId = null;
+            this.selectedCar = null;
+            this.serviceItems = null;
+            this.page = 1;
+            this.pageCount = 1;
+        },
+
         async getCars() {
             this.status = 'loading'
             this.error = null
@@ -55,17 +113,25 @@ export const useCarsStorage = defineStore('carsStorage', {
                 const cars = await getCars()
                 this.items = cars.results
 
-                let selectedFromList = null
-
-                if (this.selectedId) {
-                    selectedFromList = this.items.find(car => car.id === this.selectedId) || null
+                let selectedId = this.selectedId
+                if (selectedId && !this.items.some(car => car.id === selectedId)) {
+                    selectedId = null
                 }
 
-                if (!selectedFromList && this.items.length > 0) selectedFromList = this.items[0]
+                if (!selectedId && this.items.length > 0) {
+                    selectedId = this.items[0].id
+                }
 
-                this.selectedId = selectedFromList?.id ?? null;
-                this.selectedCar = selectedFromList;
-                this.serviceItems = selectedFromList?.serviceItems ?? null
+                this.selectedId = selectedId
+
+                if (selectedId) {
+                    const selectedCar = await getCar(selectedId)
+                    this.selectedCar = selectedCar
+                    this.serviceItems = selectedCar.serviceItems ?? null
+                } else {
+                    this.selectedCar = null
+                    this.serviceItems = null
+                }
 
                 this.status = "idle";
             } catch (error) {
@@ -96,7 +162,7 @@ export const useCarsStorage = defineStore('carsStorage', {
         },
         async updateCar() {
         },
-        async _deleteCar(id: string) {
+        async _deleteCar(_id: string) {
         },
 
         async selectCar(id: string) {
@@ -109,12 +175,40 @@ export const useCarsStorage = defineStore('carsStorage', {
 
         getProgress(item: ServiceItem, car: Car) {
             const NOW = new Date()
-            if (item.interval_km > 0) {
-                return Math.min((car.mileage - item.last_km) / item.interval_km, 1)
+            if (item.intervalKm > 0) {
+                return Math.min((car.mileage - item.lastKm) / item.intervalKm, 1)
             }
-            const last = new Date(item.last_date)
+            if (!item.lastDate) {
+                return 0
+            }
+            const last = new Date(item.lastDate)
+            if (Number.isNaN(last.getTime())) {
+                return 0
+            }
             const days = Math.round((NOW.getTime() - last.getTime()) / 86400000)
-            return Math.min(days / item.interval_days, 1)
+            return Math.min(days / item.intervalDays, 1)
+        },
+
+        getKmLeft(item: ServiceItem, car: Car) {
+            if (item.intervalKm <= 0) {
+                return null
+            }
+
+            return Math.max(item.lastKm + item.intervalKm - car.mileage, 0)
+        },
+
+        getDaysLeft(item: ServiceItem) {
+            if (item.intervalDays <= 0 || !item.lastDate) {
+                return null
+            }
+
+            const last = new Date(item.lastDate)
+            if (Number.isNaN(last.getTime())) {
+                return null
+            }
+
+            const dueAt = last.getTime() + item.intervalDays * 86400000
+            return Math.ceil((dueAt - Date.now()) / 86400000)
         },
 
         toggleSetting(key: 'notifyKm' | 'notifyDays') {

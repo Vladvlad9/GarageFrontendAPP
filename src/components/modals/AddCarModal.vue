@@ -12,13 +12,6 @@ const year = ref(0)
 const mileage = ref(0)
 
 function confirm() {
-  const data = {
-    "brand": brand.value,
-    "model": model.value,
-    "year": year.value,
-    "mileage": mileage.value
-  }
-
   if (!brand.value && !model.value) return
 
   car.createCar()

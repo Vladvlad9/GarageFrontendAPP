@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {useModalStorage} from "../../stores/modal.ts";
-import {useCarsStorage} from "../../stores/cars.ts";
 
 const modal = useModalStorage()
-const car = useCarsStorage()
 const km = ref(0)
 
 function confirm() {

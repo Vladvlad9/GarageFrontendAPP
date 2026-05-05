@@ -17,7 +17,7 @@ const email = ref('user@example.com')
 const password = ref('VeryStrongPassword1!')
 const remember = ref(false)
 const showPassword = ref(false)
-const focusedField = ref(null)
+const focusedField = ref<'email' | 'password' | null>(null)
 
 async function handleLogin() {
   auth.clearError()

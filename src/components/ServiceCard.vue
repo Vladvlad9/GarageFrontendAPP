@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed} from 'vue'
+import type {Car, ServiceItem} from "../types/cars.ts";
 import {useCarsStorage} from "../stores/cars.ts";
 import IconFuel from "./icons/IconFuel.vue";
 import IconOil from "./icons/IconOil.vue";
@@ -22,12 +23,21 @@ const iconMap = {
   fuel: IconFuel
 }
 
-const props = defineProps({ service: Object, car: Object })
+const props = defineProps<{
+  service: ServiceItem
+  car: Car
+}>()
 const emit = defineEmits(['click'])
 const store = useCarsStorage()
 
-const iconColor = computed(() => ICON_COLORS[props.service.icon] || '#888')
-const iconComponent = computed(() => iconMap[props.service.icon] || IconOil)
+const iconColor = computed(() => {
+  const key = props.service.icon as keyof typeof ICON_COLORS
+  return ICON_COLORS[key] || '#888'
+})
+const iconComponent = computed(() => {
+  const key = props.service.icon as keyof typeof iconMap
+  return iconMap[key] || IconOil
+})
 
 const progress = computed(() => store.getProgress(props.service, props.car))
 const pct = computed(() => Math.min(Math.round(progress.value * 100), 100))
@@ -38,7 +48,7 @@ const barColor = computed(() => getBarColor(progress.value, props.service))
 
 
 const meta = computed(() => {
-  const kmLeft = 0
+  const kmLeft = store.getKmLeft(props.service, props.car)
 
   if (kmLeft !== null) {
     if (kmLeft === 0) return 'Пробег исчерпан'
@@ -54,12 +64,15 @@ const meta = computed(() => {
 })
 
 const rangeText = computed(() => {
-  // if (props.service.intervalKm > 0) {
-  //   return props.service.lastKm.toLocaleString('ru') + ' → ' +
-  //     (props.service.lastKm + props.service.intervalKm).toLocaleString('ru') + ' км'
-  // }
-  // return 'каждые ' + Math.round(props.service.intervalDays / 365) + ' г.'
-  return `каждые ${10000} г.`
+  if (props.service.intervalKm > 0) {
+    return `${props.service.lastKm.toLocaleString('ru')} → ${(props.service.lastKm + props.service.intervalKm).toLocaleString('ru')} км`
+  }
+
+  if (props.service.intervalDays > 0) {
+    return `каждые ${Math.round(props.service.intervalDays / 365)} г.`
+  }
+
+  return 'без интервала'
 })
 </script>
 

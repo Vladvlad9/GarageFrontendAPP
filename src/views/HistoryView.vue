@@ -1,59 +1,95 @@
 <script setup lang="ts">
+import {computed} from "vue";
 import {useCarsStorage} from "../stores/cars.ts";
+import {formatDate, ICON_COLORS} from "../composables/useServiceHelpers.ts";
+import IconFuel from "../components/icons/IconFuel.vue";
+import IconOil from "../components/icons/IconOil.vue";
+import IconAir from "../components/icons/IconAir.vue";
+import IconBrake from "../components/icons/IconBrake.vue";
+import IconSpark from "../components/icons/IconSpark.vue";
+import IconBelt from "../components/icons/IconBelt.vue";
+import IconCool from "../components/icons/IconCool.vue";
+import IconGear from "../components/icons/IconGear.vue";
+import type {ServiceItem} from "../types/cars.ts";
 
 const carStore = useCarsStorage()
-console.log(`carStore.serviceItems ${carStore.serviceItems}`)
 
-// const hasAnyHistory = computed(() => carStore.items.some(c => (carStore.serviceItems || []).length > 0))
-function findService(carId, name) {
-  return carStore.selectedCar.serviceItems.find(s => s.name === name)
+const iconMap = {
+  oil: IconOil,
+  air: IconAir,
+  brake: IconBrake,
+  spark: IconSpark,
+  belt: IconBelt,
+  cool: IconCool,
+  gear: IconGear,
+  fuel: IconFuel,
+} as const
+
+const selectedCar = computed(() => carStore.selectedCar)
+const serviceItems = computed<ServiceItem[]>(() => selectedCar.value?.serviceItems ?? [])
+
+function findService(name: string) {
+  return serviceItems.value.find((service) => service.name === name) ?? null
 }
 
-function iconColor(carId, name) {
-  const s = findService(carId, name)
-  return s ? (ICON_COLORS[s.icon] || '#888') : '#888'
+function iconColor(name: string) {
+  const service = findService(name)
+  if (!service) return '#888'
+
+  const key = service.icon as keyof typeof ICON_COLORS
+  return ICON_COLORS[key] || '#888'
 }
 
-function iconComponent(carId, name) {
-  const s = findService(carId, name)
-  return s ? (iconMap[s.icon] || IconOil) : IconOil
+function iconComponent(name: string) {
+  const service = findService(name)
+  if (!service) return IconOil
+
+  const key = service.icon as keyof typeof iconMap
+  return iconMap[key] || IconOil
 }
 </script>
 
 <template>
-  <div>
-    <div v-if="carStore.selectedCar.serviceItems">
-      <div v-for="car in carStore.items" :key="car.id" class="history-group">
-        <div v-if="carStore.selectedCar.serviceItems.length > 0" class="history-card">
+  <div v-if="selectedCar">
+    <div v-if="serviceItems.length === 0" class="empty">
+      <div class="empty-icon">📋</div>
+      <p>История пуста. Отметьте выполненное ТО — и оно появится здесь.</p>
+    </div>
+
+    <div v-else>
+      <div class="history-group">
+        <div class="history-card">
           <div class="card-header">
-            <div class="car-dot" :style="{ background: car.color }"/>
+            <div class="car-dot" :style="{ background: selectedCar.color }"/>
             <div>
-              <div class="card-title">{{ car.name }} '{{ String(car.year).slice(2) }}</div>
-              <div class="card-sub">{{ (carStore.serviceItems || []).length }} записей</div>
+              <div class="card-title">{{ selectedCar.name }} '{{ String(selectedCar.year).slice(2) }}</div>
+              <div class="card-sub">{{ serviceItems.length }} записей</div>
             </div>
           </div>
+
           <div
-              v-for="(h, i) in carStore.serviceItems"
-              :key="i"
+              v-for="(service, i) in serviceItems"
+              :key="service.id ?? i"
               class="history-row"
           >
             <div
                 class="row-icon"
-                :style="{ background: iconColor(car.id, h.name) + '18', color: iconColor(car.id, h.name) }"
+                :style="{ background: iconColor(service.name) + '18', color: iconColor(service.name) }"
             >
-              <component :is="iconComponent(car.id, h.name)"/>
+              <component :is="iconComponent(service.name)"/>
             </div>
-            <span class="row-name">{{ h.name }}</span>
-            <span class="row-km">{{ h.km.toLocaleString('ru') }} км</span>
-            <span class="row-date">{{ formatDate(h.date) }}</span>
+            <span class="row-name">{{ service.name }}</span>
+            <span class="row-km">{{ service.lastKm.toLocaleString('ru') }} км</span>
+            <span class="row-date">{{ formatDate(service.lastDate) }}</span>
           </div>
         </div>
       </div>
     </div>
-    <div v-else class="empty">
-      <div class="empty-icon">📋</div>
-      <p>История пуста. Отметьте выполненное ТО — и оно появится здесь.</p>
-    </div>
+  </div>
+
+  <div v-else class="empty">
+    <div class="empty-icon">📋</div>
+    <p>История пуста. Отметьте выполненное ТО — и оно появится здесь.</p>
   </div>
 </template>
 

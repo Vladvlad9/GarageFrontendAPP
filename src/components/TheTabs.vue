@@ -2,11 +2,10 @@
 import {useCarsStorage} from "../stores/cars.ts";
 
 const car = useCarsStorage()
-const reminderCount = 0
 </script>
 
 <template>
-  <div class="tabs" v-if="car.status !== 'loading'">
+  <div class="tabs" v-if="car.status !== 'error'">
     <RouterLink to="/overview" class="tab" active-class="active">
       <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="2" y="3" width="7" height="7" rx="1"/>
@@ -23,14 +22,14 @@ const reminderCount = 0
       </svg>
       История
     </RouterLink>
-    <RouterLink to="/reminders" class="tab" active-class="active">
-      <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M10 2a6 6 0 0 1 6 6v3l1.5 3H2.5L4 11V8a6 6 0 0 1 6-6z"/>
-        <path d="M8 17a2 2 0 0 0 4 0"/>
-      </svg>
-      Напоминания
-      <span class="tab-count" :class="{ ok: reminderCount === 0 }">{{ reminderCount }}</span>
-    </RouterLink>
+<!--    <RouterLink to="/reminders" class="tab" active-class="active">-->
+<!--      <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">-->
+<!--        <path d="M10 2a6 6 0 0 1 6 6v3l1.5 3H2.5L4 11V8a6 6 0 0 1 6-6z"/>-->
+<!--        <path d="M8 17a2 2 0 0 0 4 0"/>-->
+<!--      </svg>-->
+<!--      Напоминания-->
+<!--      <span class="tab-count" :class="{ ok: reminderCount === 0 }">{{ reminderCount }}</span>-->
+<!--    </RouterLink>-->
     <RouterLink to="/settings" class="tab" active-class="active">
       <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="10" cy="10" r="2.5"/>

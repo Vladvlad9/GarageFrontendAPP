@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { RouterView } from 'vue-router'
 import {useRoute} from "vue-router";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, watch} from "vue";
 import {useAuthStore} from "./stores/auth.ts";
 import {useCarsStorage} from "./stores/cars.ts";
 import AddCarModal from "./components/modals/AddCarModal.vue";
@@ -16,14 +17,28 @@ const auth = useAuthStore()
 const car = useCarsStorage()
 const isAuthPage = computed(() => ['/login', '/register'].includes(route.path))
 
-// onMounted(() => {
-//   if (!isAuthPage.value) store.fetchCars()
-// })
+async function syncCars(force = false) {
+  if (isAuthPage.value) return
+  if (!auth.accessToken) return
+  if (car.status === 'loading') return
+  // if (!force && car.items.length > 0 && car.currentCar && car.currentServices.length > 0) return
 
-onMounted(() => {
-  auth.restore()
-  if (!isAuthPage.value) car.getCars()
-});
+  await car.getCars()
+}
+
+onMounted(async () => {
+  await auth.restore()
+  await syncCars()
+})
+
+watch([() => route.path, () => auth.accessToken], async () => {
+  if (!auth.accessToken) {
+    car.clearCars()
+    return
+  }
+
+  await syncCars(true)
+})
 
 </script>
 

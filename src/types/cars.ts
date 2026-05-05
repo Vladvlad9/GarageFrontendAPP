@@ -9,18 +9,18 @@ export interface ServiceItem {
     car_id: string;
     name: string;
     icon: string;
-    interval_km: number;
-    interval_days: number;
-    last_km: number;
-    last_date: string | null;
-    warn_at: number;
+    intervalKm: number;
+    intervalDays: number;
+    lastKm: number;
+    lastDate: string | null;
+    warnAt: number;
     notes: string | null;
-    is_active: boolean;
+    isActive: boolean;
     progress: number;
-    is_overdue: boolean;
-    needs_attention: boolean;
-    next_due_km: number | null;
-    next_due_date: string | null;
+    isOverdue: boolean;
+    needsAttention: boolean;
+    nextDueKm: number | null;
+    nextDueDate: string | null;
 }
 
 export interface Car {
@@ -32,13 +32,13 @@ export interface Car {
     year: number;
     mileage: number;
     vin: string | null;
-    license_plate: string | null;
-    engine_volume: number | null;
-    fuel_type: FuelType | null;
+    licensePlate: string | null;
+    engineVolume: number | null;
+    fuelType: FuelType | null;
     transmission: TransmissionType | null;
     notes: string | null;
     serviceItems: ServiceItem[];
-    is_archived: boolean;
+    isArchived: boolean;
     created_at: string;
     updated_at: string | null;
     initials?: string | null;
@@ -63,12 +63,12 @@ export interface CarUpdateRequest {
     year?: number;
     mileage?: number;
     vin?: string | null;
-    license_plate?: string | null;
-    engine_volume?: number | null;
-    fuel_type?: FuelType | null;
+    licensePlate?: string | null;
+    engineVolume?: number | null;
+    fuelType?: FuelType | null;
     transmission?: TransmissionType | null;
     notes?: string | null;
-    is_archived?: boolean;
+    isArchived?: boolean;
 }
 
 export interface CarFilters {

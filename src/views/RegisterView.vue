@@ -2,6 +2,7 @@
 import {useRouter} from "vue-router";
 import {useAuthStore} from "../stores/auth.ts";
 import {computed, ref} from "vue";
+import type {SignUpRequest} from "../types/auth.ts";
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -18,11 +19,11 @@ const password = ref('')
 const confirm = ref('')
 const agreed = ref(false)
 const showPassword = ref(false)
-const focusedField = ref(null)
-const errors = ref({})
+const focusedField = ref<'name' | 'email' | 'password' | 'confirm' | null>(null)
+const errors = ref<Partial<Record<keyof SignUpRequest, string>>>({})
 
 
-function fieldError(field) {
+function fieldError(field: keyof SignUpRequest) {
   return errors.value[field] || null
 }
 
