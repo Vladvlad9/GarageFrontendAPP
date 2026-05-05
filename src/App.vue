@@ -22,7 +22,7 @@ const isAuthPage = computed(() => ['/login', '/register'].includes(route.path))
 
 onMounted(() => {
   auth.restore()
-  car.getCars()
+  if (!isAuthPage.value) car.getCars()
 });
 
 </script>
