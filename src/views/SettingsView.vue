@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {useCarsStorage} from "../stores/cars.ts";
+import {useModalStorage} from "../stores/modal.ts";
 
 const car = useCarsStorage()
+const modal = useModalStorage()
 </script>
 
 <template>
@@ -65,7 +67,7 @@ const car = useCarsStorage()
             </div>
             <div class="settings-desc">{{ carItem.mileage.toLocaleString('ru') }} км</div>
           </div>
-          <button class="btn-danger" @click="car._deleteCar(carItem.id)">Удалить</button>
+          <button class="btn-danger" @click="modal.open('confirmDelete', carItem.id)">Удалить</button>
         </div>
       </div>
     </div>
@@ -79,18 +81,6 @@ const car = useCarsStorage()
             <div class="settings-name">Версия</div>
           </div>
           <span class="settings-value">1.0.0</span>
-        </div>
-        <div class="settings-row">
-          <div class="settings-label">
-            <div class="settings-name">Стек</div>
-          </div>
-          <span class="settings-value">Vue 3 + Pinia + FastAPI + PostgreSQL</span>
-        </div>
-        <div class="settings-row">
-          <div class="settings-label">
-            <div class="settings-name">Роутер</div>
-          </div>
-          <span class="settings-value">Vue Router 4</span>
         </div>
       </div>
     </div>

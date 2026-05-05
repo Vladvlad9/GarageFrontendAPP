@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
-import type {Car, ServiceItem} from "../types/cars.ts";
-import {getCar, getCars} from "../api/cars.ts";
+import type {Car, CarCreateRequest, ServiceItem} from "../types/cars.ts";
+import {createCar, deleteCar, getCar, getCars} from "../api/cars.ts";
 
 type LoadStatus = "idle" | "loading" | "saving" | "error";
 
@@ -150,6 +150,8 @@ export const useCarsStorage = defineStore('carsStorage', {
                 const car: Car = await getCar(id)
                 this.selectedCar = car
                 this.selectedId = car.id
+
+                this.status = 'idle'
                 return car
             } catch (error) {
                 this.status = "error"
@@ -158,11 +160,36 @@ export const useCarsStorage = defineStore('carsStorage', {
             }
         },
 
-        async createCar() {
+        async createCar(data: CarCreateRequest) {
+            this.status = 'loading'
+            this.error = null
+
+            try {
+                await createCar(data)
+                await this.getCars()
+            } catch (error) {
+                this.status = 'error'
+                this.error = error instanceof Error ? error.message : "Unknown error"
+            } finally {
+                this.status = 'idle'
+            }
         },
+
         async updateCar() {
         },
         async _deleteCar(_id: string) {
+            this.status = 'loading'
+            this.error = null
+
+            try {
+                await deleteCar(_id)
+                await this.getCars()
+            } catch (error) {
+                this.status = 'error'
+                this.error = error instanceof Error ? error.message : "Unknown error"
+            } finally {
+                this.status = 'idle'
+            }
         },
 
         async selectCar(id: string) {

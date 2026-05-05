@@ -4,6 +4,33 @@ import {useAuthStore} from "../stores/auth.ts";
 // const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api/v1";
 const baseUrl = "http://0.0.0.0:9881/api/v1"
 
+const api = axios.create({
+    baseURL: baseUrl,
+    withCredentials: true,
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('accessToken')
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+    },
+    (error) => Promise.reject(error)
+)
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            const auth = useAuthStore();
+            auth.signOut();
+        }
+        return Promise.reject(error)
+    }
+)
+
 type ApiErrorBody = {
     detail?: unknown;
     message?: unknown;
@@ -38,28 +65,17 @@ function normalizeErrorMessage(detail: unknown, fallback: string) {
     return fallback;
 }
 
-function getAccessToken() {
-    if (typeof window === "undefined") {
-        return null;
-    }
-
-    return localStorage.getItem("accessToken");
-}
 
 export async function requestJson<T>(path: string, config: AxiosRequestConfig = {}): Promise<T> {
-    const accessToken = getAccessToken();
-
     try {
-        const response = await axios({
+        const response = await api({
             url: `${baseUrl}${path}`,
             method: config.method || 'GET',
             ...config,
             headers: {
                 "Content-Type": "application/json",
-                ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : {}),
                 ...(config.headers ?? {}),
             },
-            withCredentials: true,
         });
 
         if (response.status === 204) {
@@ -68,10 +84,6 @@ export async function requestJson<T>(path: string, config: AxiosRequestConfig = 
 
         return response.data as T;
     } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-            const auth = useAuthStore();
-            auth.signOut();
-        }
         if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
             let message = `Request failed with status ${axiosError.response?.status ?? 'unknown'}`;

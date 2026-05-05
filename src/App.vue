@@ -7,6 +7,7 @@ import {useCarsStorage} from "./stores/cars.ts";
 import AddCarModal from "./components/modals/AddCarModal.vue";
 import MileageModal from "./components/modals/MileageModal.vue";
 import ServiceModal from "./components/modals/ServiceModal.vue";
+import ConfirmDeleteModal from "./components/modals/ConfirmDeleteModal.vue";
 import TheSidebar from "./components/TheSidebar.vue";
 import TheTopbar from "./components/TheTopbar.vue";
 import TheTabs from "./components/TheTabs.vue";
@@ -17,7 +18,7 @@ const auth = useAuthStore()
 const car = useCarsStorage()
 const isAuthPage = computed(() => ['/login', '/register'].includes(route.path))
 
-async function syncCars(force = false) {
+async function syncCars() {
   if (isAuthPage.value) return
   if (!auth.accessToken) return
   if (car.status === 'loading') return
@@ -37,7 +38,7 @@ watch([() => route.path, () => auth.accessToken], async () => {
     return
   }
 
-  await syncCars(true)
+  await syncCars()
 })
 
 </script>
@@ -66,6 +67,7 @@ watch([() => route.path, () => auth.accessToken], async () => {
     <ServiceModal/>
     <MileageModal/>
     <AddCarModal/>
+    <ConfirmDeleteModal/>
   </template>
 </template>
 

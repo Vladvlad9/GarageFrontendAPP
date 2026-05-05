@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {useCarsStorage} from "../../stores/cars.ts";
 import {useModalStorage} from "../../stores/modal.ts";
+import type {CarCreateRequest} from "../../types/cars.ts";
+import {useAuthStore} from "../../stores/auth.ts";
+import {storeToRefs} from "pinia";
+
 
 const car = useCarsStorage()
 const modal = useModalStorage()
+
+const auth = useAuthStore();
+const { isAuthenticated } = storeToRefs(auth);
 
 const brand = ref('')
 const model = ref('')
@@ -14,9 +21,31 @@ const mileage = ref(0)
 function confirm() {
   if (!brand.value && !model.value) return
 
-  car.createCar()
+  const form = reactive<CarCreateRequest>({
+    brand: brand.value,
+    model: model.value,
+    year: year.value,
+    mileage: mileage.value,
+  });
+  car.createCar(form)
   modal.close()
 }
+
+async function loadIfNeeded() {
+  if (isAuthenticated.value) {
+    await car.getCars();
+  }
+}
+onMounted(loadIfNeeded);
+
+watch(isAuthenticated, async (value) => {
+  if (value) {
+    await car.getCars();
+    return;
+  }
+
+  car.$reset();
+});
 </script>
 
 <template>
