@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import {RouterView} from 'vue-router'
 import {useRoute} from "vue-router";
 import {computed, onMounted, watch} from "vue";
 import {useAuthStore} from "./stores/auth.ts";
@@ -12,10 +12,13 @@ import TheSidebar from "./components/TheSidebar.vue";
 import TheTopbar from "./components/TheTopbar.vue";
 import TheTabs from "./components/TheTabs.vue";
 import AppSkeleton from "./components/AppSkeleton.vue";
+import {useItemNameStorage} from "./stores/items_name.ts";
 
 const route = useRoute()
 const auth = useAuthStore()
 const car = useCarsStorage()
+const itemName = useItemNameStorage()
+
 const isAuthPage = computed(() => ['/login', '/register'].includes(route.path))
 
 async function syncCars() {
@@ -25,6 +28,7 @@ async function syncCars() {
   // if (!force && car.items.length > 0 && car.currentCar && car.currentServices.length > 0) return
 
   await car.getCars()
+  await itemName.getListItemName()
 }
 
 onMounted(async () => {

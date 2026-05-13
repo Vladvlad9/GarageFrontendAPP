@@ -2,20 +2,30 @@
 import {ref, watch} from "vue";
 import {useModalStorage} from "../../stores/modal.ts";
 import {useCarsStorage} from "../../stores/cars.ts";
+import {useItemNameStorage} from "../../stores/items_name.ts";
 
 const modal = useModalStorage()
 const car = useCarsStorage()
+const itemName = useItemNameStorage()
 
 const mileage = ref(0)
 const date = ref('')
+const other = ref(false)
+const selectedItemId = ref('')
+const customItemName = ref('')
 
 watch(() => modal.isOpen('service'), (open) => {
   if (open) {
     // selectedServiceId.value = car.selectedCar?.serviceItems[0]?.id ?? null
     mileage.value = car.selectedCar?.mileage ?? 0
     date.value = new Date().toISOString().slice(0, 10)
+    other.value = false
+    selectedItemId.value = itemName.items[0]?.id ?? ''
+    customItemName.value = ''
   }
 })
+
+
 
 function confirm() {
   // if (!selectedServiceId.value) return
@@ -31,18 +41,42 @@ function confirm() {
         <div class="modal-title">Отметить ТО — {{ car.selectedCar?.name }}</div>
         <div class="field">
           <label>Пункт ТО</label>
-          <select>
-            <option v-for="s in car.selectedCar?.serviceItems" :key="s.id" :value="s.id">{{ s.name }}</option>
+          <select v-if="!other" v-model="selectedItemId">
+            <option v-for="item in itemName.items" :key="item.id" :value="item.id">{{ item.name }}</option>
           </select>
+
+          <input
+              v-else
+              v-model="customItemName"
+              type="text"
+              placeholder="Например, свечи"
+          />
+
+          <div class="other-row">
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="other"/>
+              <span class="checkbox-box"/>
+              Другое
+              <span
+                  class="help-tip"
+                  tabindex="0"
+                  data-tip="Выберите это, если нужного пункта нет в списке"
+                  aria-label="Выберите это, если нужного пункта нет в списке"
+              >?</span>
+            </label>
+          </div>
+
         </div>
         <div class="field">
           <label>Пробег при замене, км</label>
-          <input type="number" v-model.number="mileage"/>
+          <input type="number" v-model.number="mileage" placeholder="10000"/>
         </div>
+
         <div class="field">
           <label>Дата</label>
           <input type="date" v-model="date"/>
         </div>
+
         <div class="modal-actions">
           <button class="btn" @click="modal.close()">Отмена</button>
           <button class="btn btn-primary" @click="confirm()">Сохранить</button>
@@ -86,7 +120,7 @@ function confirm() {
   margin-bottom: 14px;
 }
 
-.field label {
+.field > label {
   display: block;
   font-size: 11px;
   color: var(--muted);
@@ -142,5 +176,101 @@ function confirm() {
 
 .btn-primary:hover {
   background: rgba(74, 158, 255, 0.15);
+}
+
+.other-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.help-tip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  cursor: help;
+}
+
+.help-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  min-width: 220px;
+  max-width: 260px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 12, 0.96);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+.help-tip:hover::after,
+.help-tip:focus-visible::after {
+  opacity: 1;
+}
+
+.checkbox-label input {
+  display: none;
+}
+
+.checkbox-box {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.checkbox-label input:checked + .checkbox-box {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.checkbox-label input:checked + .checkbox-box::after {
+  content: '';
+  width: 4px;
+  height: 7px;
+  border: 1.5px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
 }
 </style>

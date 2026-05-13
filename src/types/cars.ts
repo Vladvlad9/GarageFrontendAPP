@@ -1,4 +1,5 @@
 import type {Pagination} from "./pagination.ts";
+import type {ServiceItemNameBase} from "./items_name.ts";
 
 export type FuelType = "petrol" | "diesel" | "electric" | "gas" | "hybrid";
 export type TransmissionType = "manual" | "automatic" | "cvt" | "robot";
@@ -7,7 +8,8 @@ export type TransmissionType = "manual" | "automatic" | "cvt" | "robot";
 export interface ServiceItem {
     id: string;
     car_id: string;
-    name: string;
+    // name: string;
+    serviceItemName: ServiceItemNameBase
     icon: string;
     intervalKm: number;
     intervalDays: number;

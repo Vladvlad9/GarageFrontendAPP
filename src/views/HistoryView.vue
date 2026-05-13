@@ -29,14 +29,14 @@ const selectedCar = computed(() => carStore.selectedCar)
 const serviceItems = computed<ServiceItem[]>(() => selectedCar.value?.serviceItems ?? [])
 
 function findService(name: string) {
-  return serviceItems.value.find((service) => service.name === name) ?? null
+  return serviceItems.value.find((service) => service.serviceItemName.name === name) ?? null
 }
 
 function iconColor(name: string) {
   const service = findService(name)
   if (!service) return '#888'
 
-  const key = service.icon as keyof typeof ICON_COLORS
+  const key = service.serviceItemName.icon as keyof typeof ICON_COLORS
   return ICON_COLORS[key] || '#888'
 }
 
@@ -44,7 +44,7 @@ function iconComponent(name: string) {
   const service = findService(name)
   if (!service) return IconOil
 
-  const key = service.icon as keyof typeof iconMap
+  const key = service.serviceItemName.icon as keyof typeof iconMap
   return iconMap[key] || IconOil
 }
 </script>
@@ -74,11 +74,11 @@ function iconComponent(name: string) {
           >
             <div
                 class="row-icon"
-                :style="{ background: iconColor(service.name) + '18', color: iconColor(service.name) }"
+                :style="{ background: iconColor(service.serviceItemName.name) + '18', color: iconColor(service.serviceItemName.name) }"
             >
-              <component :is="iconComponent(service.name)"/>
+              <component :is="iconComponent(service.serviceItemName.name)"/>
             </div>
-            <span class="row-name">{{ service.name }}</span>
+            <span class="row-name">{{ service.serviceItemName.name }}</span>
             <span class="row-km">{{ service.lastKm.toLocaleString('ru') }} км</span>
             <span class="row-date">{{ formatDate(service.lastDate) }}</span>
           </div>

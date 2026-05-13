@@ -79,14 +79,14 @@ const modal = useModalStorage()
     <div class="history-card">
       <div v-if="car.currentServices.length === 0" class="empty">Нет записей</div>
       <div
-          v-for="(h, i) in car.recentServices"
-          :key="i"
+          v-for="(service, id) in car.recentServices"
+          :key="id"
           class="history-row"
       >
         <div class="hist-dot" style="background: #4ade80"/>
-        <span class="hist-name">{{ h.name }}</span>
-        <span class="hist-km">{{ h.lastKm.toLocaleString('ru') }} км</span>
-        <span class="hist-date">{{ h.lastDate ?? '—' }}</span>
+        <span class="hist-name">{{ service.serviceItemName.name }}</span>
+        <span class="hist-km">{{ service.lastKm.toLocaleString('ru') }} км</span>
+        <span class="hist-date">{{ service.lastDate ?? '—' }}</span>
       </div>
     </div>
   </div>

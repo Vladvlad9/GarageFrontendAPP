@@ -177,6 +177,7 @@ export const useCarsStorage = defineStore('carsStorage', {
 
         async updateCar() {
         },
+
         async _deleteCar(_id: string) {
             this.status = 'loading'
             this.error = null

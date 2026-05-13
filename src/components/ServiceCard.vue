@@ -31,12 +31,13 @@ const emit = defineEmits(['click'])
 const store = useCarsStorage()
 
 const iconColor = computed(() => {
-  const key = props.service.icon as keyof typeof ICON_COLORS
+  const key = props.service.serviceItemName.icon as keyof typeof ICON_COLORS
   return ICON_COLORS[key] || '#888'
 })
+
 const iconComponent = computed(() => {
-  const key = props.service.icon as keyof typeof iconMap
-  return iconMap[key] || IconOil
+  const key = props.service.serviceItemName.icon as keyof typeof iconMap
+  return iconMap[key] || IconCool
 })
 
 const progress = computed(() => store.getProgress(props.service, props.car))
@@ -44,7 +45,6 @@ const pct = computed(() => Math.min(Math.round(progress.value * 100), 100))
 const isUrgent = computed(() => progress.value >= 1)
 const badge = computed(() => getBadge(progress.value, props.service))
 const barColor = computed(() => getBarColor(progress.value, props.service))
-
 
 
 const meta = computed(() => {
@@ -83,7 +83,7 @@ const rangeText = computed(() => {
         <component :is="iconComponent"/>
       </div>
       <div>
-        <div class="sc-name">{{ service.name }}</div>
+        <div class="sc-name">{{ service.serviceItemName.name }}</div>
         <div class="sc-meta">{{ meta }}</div>
       </div>
     </div>
