@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
-import type {Car, CarCreateRequest, ServiceItem} from "../types/cars.ts";
+import type {Car, CarCreateRequest} from "../types/cars.ts";
 import {createCar, deleteCar, getCar, getCars} from "../api/cars.ts";
+import type {ServiceItem} from "../types/serviceItem.ts";
 
 type LoadStatus = "idle" | "loading" | "saving" | "error";
 
