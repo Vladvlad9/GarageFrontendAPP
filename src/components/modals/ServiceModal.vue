@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import {reactive, ref, watch} from "vue";
 import {useModalStorage} from "../../stores/modal.ts";
 import {useCarsStorage} from "../../stores/cars.ts";
 import {useItemNameStorage} from "../../stores/items_name.ts";
+import {useServiceItemStorage} from "../../stores/serviceItem.ts";
+import type {ServiceItemCreateDTO} from "../../types/serviceItem.ts";
 
 const modal = useModalStorage()
 const car = useCarsStorage()
 const itemName = useItemNameStorage()
+const serviceItem = useServiceItemStorage()
 
 const mileage = ref(0)
 const date = ref('')
@@ -30,6 +33,15 @@ watch(() => modal.isOpen('service'), (open) => {
 function confirm() {
   // if (!selectedServiceId.value) return
   // store.markService(store.activeCarId, selectedServiceId.value, mileage.value, date.value)
+
+  const form = reactive<ServiceItemCreateDTO>({
+    carId: car.selectedCar?.id,
+    serviceItemNameId: selectedItemId.value,
+    lastKm: mileage.value,
+    lastDate: date.value,
+  });
+
+  serviceItem.createServiceItem(form)
   modal.close()
 }
 </script>
